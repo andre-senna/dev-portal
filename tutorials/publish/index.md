@@ -243,11 +243,11 @@ snet service metadata-init SERVICE_PROTOBUF_DIR SERVICE_DISPLAY_NAME PAYMENT_ADD
 ```
 
 You need to specify the following parameters:
-* SERVICE_PROTOBUF_DIR - Directory which contains protobuf files of your service: ```service/service_spec/``` in case of our example service.
-* SERVICE_DISPLAY_NAME - Display name of your service. You can choose any name you want. 
-* PAYMENT_ADDRESS - Ethereum account which will receive payments for this service. You should set it to your ethereum account. You can use ```snet account print``` to see your account.
-* SERVICE_ENDPOINT - Endpoint which will be used to connect to your service.
-* FIXED_PRICE - Price in AGI for a single call to your service. We will set the price to 1 COG (remember that 1 AGI = 10^8 COGS).
+* `SERVICE_PROTOBUF_DIR` - Directory which contains protobuf files of your service: ```service/service_spec/``` in case of our example service.
+* `SERVICE_DISPLAY_NAME` - Display name of your service. You can choose any name you want. 
+* `PAYMENT_ADDRESS` - Ethereum account which will receive payments for this service. You should set it to your ethereum account. You can use ```snet account print``` to see your account.
+* `SERVICE_ENDPOINT` - Endpoint which will be used to connect to your service.
+* `FIXED_PRICE` - Price in AGI for a single call to your service. We will set the price to 1 COG (remember that 1 AGI = 10^8 COGS).
 
 For example:
 ```
