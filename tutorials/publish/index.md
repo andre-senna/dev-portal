@@ -41,8 +41,8 @@ In this tutorial we will publish an example service in SingularityNET using Kova
 
 To prepare your system for this tutorial you have two options:
 
-1. Installing all the the requirements on your system (check [Step 1a](#step-1a-setup-your-system)).
-2. Using a pre-configured [Docker](https://www.docker.com/) image (check [Step 1b](#step-1b-setup-a-docker-container)).
+1. Installing all the the requirements on your system (go to [Step 1a](#step-1a-setup-your-system)).
+2. Using a pre-configured [Docker](https://www.docker.com/) image (go to [Step 1b](#step-1b-setup-a-docker-container)).
 
 ## Step 1a. Setup your system
 
@@ -128,9 +128,9 @@ From this point we follow the tutorial in the Docker container's prompt.
 
 Now you can proceed to [Step 2](#step-2-setup-some-helpful-environment-variables).
 
-## Step 2. Setup some helpful Environment Variables:
+## Step 2. Setup Environment Variables
 
-We need some required specs to publish a service, lets set them as an environment variables:
+We need some required specs to publish a service, lets set them as environment variables:
 
 _Note_: Feel free to change the values.
 
