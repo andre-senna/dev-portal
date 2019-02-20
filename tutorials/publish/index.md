@@ -95,12 +95,19 @@ docker build -t snet_publish_service https://github.com/singnet/dev-portal.git#m
 Now you can simply run a docker container (with proper port mapping).
 
 ```
-docker run -p 7000:7000 -ti snet_publish_service bash
+SERVICE_PORT=7000
+docker run -p $SERVICE_PORT:$SERVICE_PORT -ti snet_publish_service bash
 ```
 
-However in case of real service it might not be enough. Service (more precisely `SNET DAEMON`) stores payments in etcd storage. They will be written in blockchain only after you claim them using ```snet treasurer``` commands. It means that if you lose your etcd storage you lose all unclaimed payments. 
+However in case of real service it might not be enough. Service (more precisely `SNET DAEMON`) stores payments in etcd storage. 
+They will be written in blockchain only after you claim them using ```snet treasurer``` commands. 
+It means that if you lose your etcd storage you lose all unclaimed payments. 
 
-In this example we run etcd cluster inside a docker container (more precisely inside a `SNET DAEMON`) and all payments are stored in etcd folder `/opt/singnet/etcd/`, it means that you only need to store this etcd folder outside the docker container to make this setup suitable for the real use-case (you can use `-v` option in ```docker run``` command). You also have the possibility to configure `SNET DAEMON` to store payments in external etcd cluster.
+In this example we run etcd cluster inside a docker container (more precisely inside a `SNET DAEMON`) 
+and all payments are stored in etcd folder `/opt/singnet/etcd/`, 
+it means that you only need to store this etcd folder outside the docker container to make this setup suitable for the real use-case 
+(you can use `-v` option in ```docker run``` command). 
+You also have the possibility to configure `SNET DAEMON` to store payments in external etcd cluster.
 
 For example:
 
@@ -113,7 +120,7 @@ ETCD_CONTAINER=/opt/singnet/etcd/
 SNET_HOST=$HOME/.snet
 SNET_CONTAINER=/root/.snet
 
-# !!! Must be mapped in the container
+# !!! Port mapping
 SERVICE_PORT=7000
 
 docker run \
@@ -124,7 +131,7 @@ docker run \
     -ti snet_publish_service bash
 ```
 
-From this point we follow the tutorial in the Docker container's prompt.
+From this point on we follow the tutorial in the Docker container's prompt.
 
 Now you can proceed to [Step 2](#step-2-setup-environment-variables).
 
