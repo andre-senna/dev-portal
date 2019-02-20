@@ -190,10 +190,12 @@ You need some ETH and AGI tokens. You can get them for free using your Github's 
 
 Get the address of your account using ```snet account print``` command.
 
-## Step 5 (optional if you already have an organization) 
+## Step 5. Create an organization (optional if you already have an organization) 
 
-Create an organization.
+In order to be able to publish a service you need to be the owner or a member of an organization.
 
+You can create a new organization with:
+ 
 ```
 snet organization create $ORGANIZATION_NAME --org-id $ORGANIZATION_ID
 ```
@@ -413,7 +415,7 @@ Our recommendations are following
 
 For more information about the `SNET MultiPartyEscrow` check this [link](https://dev.singularitynet.io/docs/all/mpe/mpe/). 
 
-## Step 12 (optional). Withdraw AGI tokens from MPE
+## Step 12. (optional) Withdraw AGI tokens from MPE
 
 After the step 10, all the AGIs are in the MultiPartyEscrow (MPE).
 
