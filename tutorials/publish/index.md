@@ -135,9 +135,11 @@ We need some required specs to publish a service, lets set them as environment v
 _Note_: Feel free to change the values.
 
 ```
+USER=$([ "$USER" ] && echo "$USER" || echo "user")
+
 # !!! Organization's info
-ORGANIZATION_ID=$USER_org
-ORGANIZATION_NAME="$USER's Organization"
+ORGANIZATION_ID="$USER"_org
+ORGANIZATION_NAME="The $USER's Organization"
 
 # !!! Service's info
 SERVICE_ID=example-service
@@ -150,6 +152,7 @@ SERVICE_PORT=7000
 DAEMON_HOST=0.0.0.0
 # !!! Else
 DAEMON_HOST=SERVICE_IP
+
 DAEMON_PORT=SERVICE_PORT
 ```
 
@@ -197,14 +200,16 @@ In order to be able to publish a service you need to be the owner or a member of
 You can create a new organization with:
  
 ```
-snet organization create $ORGANIZATION_NAME --org-id $ORGANIZATION_ID
+snet organization create "$ORGANIZATION_NAME" --org-id $ORGANIZATION_ID
 ```
 
 In case of an already taken `ORGANIZATION_ID` replace it with a different id of your choice.
 Make sure you follow our [naming standardisation guidelines][naming-standards].
+
 Don't forget to update the environment variable too:
+
 ```
-ORGANIZATION_ID="New_ORG_ID"
+ORGANIZATION_ID="NEW_ORG_ID"
 ```
 
 If you want to join an existing organization (e.g. `snet`), ask the owner to add your public key (account) into it before proceeding.
@@ -247,7 +252,7 @@ You need to specify the following parameters:
 For example:
 ```
 ACCOUNT=`snet account print`
-snet service metadata-init service/service_spec/ $SERVICE_NAME $ACCOUNT --endpoints http://$SERVICE_IP:$SERVICE_PORT --fixed-price 0.00000001 
+snet service metadata-init service/service_spec/ "$SERVICE_NAME" $ACCOUNT --endpoints http://$SERVICE_IP:$SERVICE_PORT --fixed-price 0.00000001 
 ```
 This command will create ```service_metadata.json``` file. 
 Please take a look into this file. You can find the description of service metadata format in [mpe-metadata](https://dev.singularitynet.io/docs/all/mpe/mpe-metadata/).
