@@ -63,7 +63,7 @@ sudo apt-get install wget git
 sudo apt-get install python3 python3-pip
 sudo apt-get install nodejs npm
 sudo apt-get install libudev-dev libusb-1.0-0-dev
-pip3 install snet-cli
+sudo pip3 install snet-cli
 
 # !!! Change version to the latest snet-daemon from releases link above
 SNETD_VERSION="v0.1.6"
@@ -117,7 +117,7 @@ SNET_CONTAINER=/root/.snet
 SERVICE_PORT=7000
 
 docker run \
-    --name MY_SNET_SERVICE
+    --name MY_SNET_SERVICE \
     -p $SERVICE_PORT:$SERVICE_PORT \
     -v $ETCD_HOST:$ETCD_CONTAINER \
     -v $SNET_HOST:$SNET_CONTAINER \
