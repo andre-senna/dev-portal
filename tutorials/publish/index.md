@@ -73,7 +73,7 @@ chmod a+x snetd-linux-amd64
 sudo mv snetd-linux-amd64 /usr/bin/snetd
 ```
 
-Now you can proceed to [Step 2](#step-2-setup-some-helpful-environment-variables).
+Now you can proceed to [Step 2](#step-2-setup-environment-variables).
 
 ## Step 1b. Setup a Docker container
 
@@ -126,7 +126,7 @@ docker run \
 
 From this point we follow the tutorial in the Docker container's prompt.
 
-Now you can proceed to [Step 2](#step-2-setup-some-helpful-environment-variables).
+Now you can proceed to [Step 2](#step-2-setup-environment-variables).
 
 ## Step 2. Setup Environment Variables
 
@@ -151,9 +151,9 @@ SERVICE_PORT=7000
 # !!! If using Docker
 DAEMON_HOST=0.0.0.0
 # !!! Else
-DAEMON_HOST=SERVICE_IP
+DAEMON_HOST=$SERVICE_IP
 
-DAEMON_PORT=SERVICE_PORT
+DAEMON_PORT=$SERVICE_PORT
 ```
 
 ## Step 3. Setup `SNET CLI` and create your identity
@@ -209,7 +209,7 @@ Make sure you follow our [naming standardisation guidelines][naming-standards].
 Don't forget to update the environment variable too:
 
 ```
-ORGANIZATION_ID="NEW_ORG_ID"
+ORGANIZATION_ID="new_org_id"
 ```
 
 If you want to join an existing organization (e.g. `snet`), ask the owner to add your public key (account) into it before proceeding.
@@ -252,8 +252,12 @@ You need to specify the following parameters:
 For example:
 ```
 ACCOUNT=`snet account print`
-snet service metadata-init service/service_spec/ "$SERVICE_NAME" $ACCOUNT --endpoints http://$SERVICE_IP:$SERVICE_PORT --fixed-price 0.00000001 
+snet service metadata-init service/service_spec/ "$SERVICE_NAME" $ACCOUNT --endpoints http://$SERVICE_IP:$SERVICE_PORT --fixed-price 0.00000001
+
+# !!! (optional) You can add some text to describe your service and an URL for further information.
+snet service metadata-add-description --json '{"description": "Description of my Service.", "url": "https://service_users_guide.com"}'
 ```
+
 This command will create ```service_metadata.json``` file. 
 Please take a look into this file. You can find the description of service metadata format in [mpe-metadata](https://dev.singularitynet.io/docs/all/mpe/mpe-metadata/).
 
