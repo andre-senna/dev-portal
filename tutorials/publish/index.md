@@ -138,7 +138,7 @@ _Note_: Feel free to change the values.
 USER=$([ "$USER" ] && echo "$USER" || echo "user")
 
 # !!! Organization's info
-ORGANIZATION_ID="$USER"_org
+ORGANIZATION_ID="$USER"-org
 ORGANIZATION_NAME="The $USER's Organization"
 
 # !!! Service's info
@@ -209,7 +209,7 @@ Make sure you follow our [naming standardisation guidelines][naming-standards].
 Don't forget to update the environment variable too:
 
 ```
-ORGANIZATION_ID="new_org_id"
+ORGANIZATION_ID="new-org-id"
 ```
 
 If you want to join an existing organization (e.g. `snet`), ask the owner to add your public key (account) into it before proceeding.
