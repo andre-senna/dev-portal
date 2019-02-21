@@ -92,38 +92,51 @@ Setup a `ubuntu:18.04` docker container using provided `Dockerfile`.
 docker build -t snet_publish_service https://github.com/singnet/dev-portal.git#master:/tutorials/docker
 ```
 
+Setup environment variables (variables are explained later in the tutorial as they're used)
+
+```
+ORGANIZATION_ID="$USER"-org
+ORGANIZATION_NAME="The $USER's Organization"
+
+SERVICE_ID=example-service
+SERVICE_NAME="SNET Example Service"
+SERVICE_IP=127.0.0.1
+SERVICE_PORT=7000
+
+DAEMON_HOST=0.0.0.0
+USER_ID = $USER
+```
+
 Now you can simply run a docker container (with proper port mapping).
 
-```
-SERVICE_PORT=7000
-docker run -p $SERVICE_PORT:$SERVICE_PORT -ti snet_publish_service bash
-```
-
-However in case of real service it might not be enough. Service (more precisely `SNET DAEMON`) stores payments in etcd storage. 
-They will be written in blockchain only after you claim them using ```snet treasurer``` commands. 
-It means that if you lose your etcd storage you lose all unclaimed payments. 
-
-In this example we run etcd cluster inside a docker container (more precisely inside a `SNET DAEMON`) 
-and all payments are stored in etcd folder `/opt/singnet/etcd/`, 
-it means that you only need to store this etcd folder outside the docker container to make this setup suitable for the real use-case 
-(you can use `-v` option in ```docker run``` command). 
-You also have the possibility to configure `SNET DAEMON` to store payments in external etcd cluster.
-
-For example:
+XXX
+Tab 1: standard docker run
 
 ```
-# !!! (recommended) To secure payments
+docker run \
+XXX variaveis
+-p $SERVICE_PORT:$SERVICE_PORT \
+-ti snet_publish_service bash
+```
+XXX
+Tab 2: (optional) persistence on host machine
+
+Services store some sensible information in the filesystem. So you may want to share a couple of folders in your host machine with the Docker container to avoid then from vanishing if you loose the Docker container.
+
+- etcd storage folder (XXX link para o daemon direto para a secao do etcd)
+- SNET CLI configuration folder (XXX link para a Cli)
+
+```
+# To secure payments
 ETCD_HOST=$HOME/singnet/etcd/example-service/
 ETCD_CONTAINER=/opt/singnet/etcd/
 
-# !!! (optional) To make your snet's configs persistent between multiple containers
+# To make your snet's configs persistent between multiple containers
 SNET_HOST=$HOME/.snet
 SNET_CONTAINER=/root/.snet
 
-# !!! Port mapping
-SERVICE_PORT=7000
-
 docker run \
+XXX variaveis
     --name MY_SNET_SERVICE \
     -p $SERVICE_PORT:$SERVICE_PORT \
     -v $ETCD_HOST:$ETCD_CONTAINER \
@@ -133,65 +146,30 @@ docker run \
 
 From this point on we follow the tutorial in the Docker container's prompt.
 
-Now you can proceed to [Step 2](#step-2-setup-environment-variables).
-
-## Step 2. Setup Environment Variables
-
-We need some required specs to publish a service, lets set them as environment variables:
-
-_Note_: Feel free to change the values.
-
-```
-USER=$([ "$USER" ] && echo "$USER" || echo "user")
-
-# !!! Organization's info
-ORGANIZATION_ID="$USER"-org
-ORGANIZATION_NAME="The $USER's Organization"
-
-# !!! Service's info
-SERVICE_ID=example-service
-SERVICE_NAME="SNET Example Service"
-# !!! Set this with the IP where your service will be available
-SERVICE_IP=127.0.0.1
-SERVICE_PORT=7000
-
-# !!! If using Docker
-DAEMON_HOST=0.0.0.0
-# !!! Else
-DAEMON_HOST=$SERVICE_IP
-
-DAEMON_PORT=$SERVICE_PORT
-```
-
 ## Step 3. Setup `SNET CLI` and create your identity
 
-We will work on Kovan Test Network. `SNET CLI` has Kovan as default network. You can switch network using ```snet network``` command.
-For example in order to switch to Ropsten Test Network you must run ```snet network ropsten```.
+XXX
+Tab 1: mnemonic key setup
 
-You can create your identity in `SNET CLI` using ```snet identity create``` command. `SNET CLI` supports the following identity types:
-
-* key
-* rpc
-* mnemonic
-* ledger
-* trezor
-
-In this tutorial we'll use the mnemonic identity type. 
+Select a Mnemonic of your choice. MY_MNEMONIC is a string which will be used as seed to generate a public/private key pair. (see XXX here for details)
 
 ```
-# !!! replace MY_MNEMONIC with your mnemonic
-snet identity create MY_ID_NAME mnemonic --mnemonic "MY_MNEMONIC"
+snet identity create $USER_ID mnemonic --mnemonic "MY_MNEMONIC"
 ```
+Tab 2: (optional) other key options  
 
-Replace `MY_MNEMONIC` with any string that you want. 
-You can replace `MY_ID_NAME` by an id to identify your key in the `SNET CLI`. 
-This id will not be seen by anyone. It's just a way to make it easier for you to refer to your account (you may have many, btw) in following `snet` commands. 
-This alias is kept locally in the container and will vanish when it's shutdown. 
-So you might want to configure `SNET CLI` not in the container, or you can simply keep its configuration (```$HOME/.snet``` directory) outside the container. 
+You can create your identity by using a previously created key.
 
-`SNET CLI` will automatically switch to this identity because it will be the first identity created. 
+`SNET CLI` supports theese other identity types:
 
-## Step 4. Get Kovan ETH and AGI (optional if you already have enough ETH and AGI tokens) 
+* key - a text private key
+* rpc - JSON-RPC key server
+* ledger - hardware wallet
+* trezor - hardware wallet
+
+XXX see details on how to use them here (Documentacao da Cli direto na secao apropriada)
+
+## Step 4. Get ETH and AGI
 
 You need some ETH and AGI tokens. You can get them for free using your Github's account here:
 
@@ -200,7 +178,7 @@ You need some ETH and AGI tokens. You can get them for free using your Github's 
 
 Get the address of your account using ```snet account print``` command.
 
-## Step 5. Create an organization (optional if you already have an organization) 
+## Step 5. Create an organization
 
 In order to be able to publish a service you need to be the owner or a member of an organization.
 
@@ -211,9 +189,7 @@ snet organization create "$ORGANIZATION_NAME" --org-id $ORGANIZATION_ID
 ```
 
 In case of an already taken `ORGANIZATION_ID` replace it with a different id of your choice.
-Make sure you follow our [naming standardisation guidelines][naming-standards].
-
-Don't forget to update the environment variable too:
+Make sure you follow our [naming standardisation guidelines][naming-standards]. If you use a different organization id (other than the one we provided in step 2, update ORGANIZATION_ID properly as it is used later in this tutorial.
 
 ```
 ORGANIZATION_ID="new-org-id"
@@ -239,11 +215,11 @@ pip3 install -r requirements.txt
 sh buildproto.sh
 ```
 
-Service is ready, however we need to publish it in SingularityNET and we need to configure the `SNET DAEMON` which will deal with payments.
+Service is ready to run, but first we need to publish it in SingularityNET and configure the `SNET DAEMON`.
 
 ## Step 7. Prepare service metadata to publish the service
 
-As a first step in publish procedure we should create a service metadata file. You can do it by calling the following command:
+First we need to create a service metadata file. You can do it by runing:
 
 ```
 snet service metadata-init SERVICE_PROTOBUF_DIR SERVICE_DISPLAY_NAME PAYMENT_ADDRESS --endpoints SERVICE_ENDPOINT --fixed-price FIXED_PRICE
@@ -257,20 +233,22 @@ You need to specify the following parameters:
 * `FIXED_PRICE` - Price in AGI for a single call to your service. We will set the price to 1 COG (remember that 1 AGI = 10^8 COGS).
 
 For example:
+
 ```
 ACCOUNT=`snet account print`
 snet service metadata-init service/service_spec/ "$SERVICE_NAME" $ACCOUNT --endpoints http://$SERVICE_IP:$SERVICE_PORT --fixed-price 0.00000001
 
-# !!! (optional) You can add some text to describe your service and an URL for further information.
-snet service metadata-add-description --json '{"description": "Description of my Service.", "url": "https://service_users_guide.com"}'
+# Describe your service and add an URL for further service information.
+snet service metadata-add-description --json '{"description": "Description of my Service.", "url": "https://service.users.guide"}'
 ```
 
-This command will create ```service_metadata.json``` file. 
-Please take a look into this file. You can find the description of service metadata format in [mpe-metadata](https://dev.singularitynet.io/docs/all/mpe/mpe-metadata/).
+This command will create a JSON configuration file: ```service_metadata.json```.
+
+See details of service metadata in [mpe-metadata](https://dev.singularitynet.io/docs/all/mpe/mpe-metadata/).
 
 ## Step 8. Publish the service in SingularityNET
 
-You can publish your service using the following command:
+Now you can publish your service using the following command (```service_metadata.json``` is used implicitly):
 
 ```
 snet service publish $ORGANIZATION_ID $SERVICE_ID
@@ -288,11 +266,9 @@ Optionally you can un-publish the service:
 snet service delete $ORGANIZATION_ID $SERVICE_ID
 ```
 
-## Step 9. Run the service
+## Step 9. Run the service (and SNET Daemon)
 
-Running the service and `SNET Daemon`.
-
-In the service folder, create a file named `snetd.config.json`. 
+Create a SNET Daemon configuration file named `snetd.config.json`. 
 
 ```
 cat > snetd.config.json << EOF
@@ -311,20 +287,14 @@ cat > snetd.config.json << EOF
    "LOG": {
        "LEVEL": "debug",
        "OUTPUT": {
-              "TYPE": "stdout"
-           }
+          "TYPE": "stdout"
+       }
    }
 }
 EOF
 ```
 
-For Ropsten Test Network, you will need to change the following key values:
-
-- `ETHEREUM_JSON_RPC_ENDPOINT`: `https://ropsten.infura.io`
-- `REGISTRY_ADDRESS_KEY`: `0x5156fde2ca71da4398f8c76763c41bc9633875e4`
-
-Now we can run the service (that will spawn an instance of `SNET Daemon`) 
-from the same path where `snet.config.json` is:
+Running the service will make a instance of SNET Daemon to be spawned automatically.
 
 ```
 python3 run_example_service.py
@@ -334,13 +304,14 @@ At this point your service should be up and running.
 
 ## Step 10. Call your service using `SNET CLI`
 
-You can call your service using `SNET CLI` for testing purpose. 
+Open a new terminal in your host machine and attach the docker container to it using
 
-After running the service, the terminal will not return to you, so you will need to open a second terminal in your container.
+```docker exec -it MY_SNET_SERVICE bash```
 
-* You should open new terminal in your main system.
-* (Docker) Enter into your service's container:
-    * `docker exec -it MY_SNET_SERVICE bash`.
+At this point you can use several SNET CLI commands to interact with your account and the Kovan network.
+(see XXX for a list of all available commands)
+
+Check your balance and setup a MPE channel to run your service.
 
 ```
 # check your balance
@@ -348,17 +319,16 @@ snet account balance
 
 # deposit funds (10 COG) into MultiPartyEscrow (`MPE`) contract:
 snet account deposit 0.00000010
-```
 
-In order to open a payment channel to your service your can use the following command:
-
-```
+# open a payment channel to your service:
 snet channel open-init $ORGANIZATION_ID $SERVICE_ID 0.0000001 +10days
 ```
 
+```snet channel open-init``` prints the id of the created channel. Record it for use in the the following commands.
+
 With the above command we've opened and initialized a channel with 10 cogs for ORGANIZATION_ID/SERVICE_ID with expiration of 10 days (57600 blocks in the future with 15 sec/blocks):
 
-Now, you can check your channels:
+Check your channels:
 
 ```
 # list of locally initialized channels
@@ -367,11 +337,6 @@ snet channel print-initialized
 # list of all channels with the current identity as a sender
 snet channel print-all-filter-sender
 ```
-
-It should be noted that if you delete your `SNET CLI` configuration folder (`~/.snet`) you'll remove all your initialized channels. 
-But you can easily find all your channels using ```snet channel print-all-filter-sender``` command and initialize them again using ```snet channel init``` command.
-
-From now on, the `SNET Daemon` must be running!
 
 You can inspect a channel state (you should use `CHANNEL_ID` which was returned by ```snet channel open-init```):
 
@@ -386,28 +351,12 @@ Finally, you can call your service with:
 # snet client call $ORGANIZATION_ID $SERVICE_ID mul '{"a":12,"b":7}'
 ```
 
-## Step 11. Treasurer
+At this point you've spent 1 Cog (as defined in step XXX 7) of your MPE channel calling the service.
+You can keep calling the service until your MPE channel run out of funds. Unused funds in the channel can be claimed back only after the channel expires.
 
-As was described before, your funds have not been yet written on the blockchain. You need to claim them using ```snet treasurer``` commands.
+## Step 11. Claiming funds from the MPE channel
 
-First you should make sure that your current identity corresponds to `PAYMENT_ADDRESS` of your service. 
-```
-# print the address of your current identity
-snet account print
-
-# print metadata of your service
-snet service print-metadata $ORGANIZATION_ID $SERVICE_ID
-```
-
-You can check your balance using ```snet account balance``` command.
-
-To print the list of unclaimed channels and also the total amount of unclaimed funds:
-
-``` 
-snet treasurer print-unclaimed --endpoint $SERVICE_IP:$SERVICE_PORT
-```
-
-To claim all channels at once:
+``` snet treasurer``` commands can be used to claim funds from a MPE channels. (see a complete list of 
 
 ```
 snet treasurer claim-all --endpoint $SERVICE_IP:$SERVICE_PORT -y
