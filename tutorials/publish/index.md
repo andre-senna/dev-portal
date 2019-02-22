@@ -309,7 +309,7 @@ Open a new terminal in your host machine and attach the docker container to it u
 ```docker exec -it MY_SNET_SERVICE bash```
 
 At this point you can use several SNET CLI commands to interact with your account and the Kovan network.
-(see XXX for a list of all available commands)
+(see XXX for a list of all available commands).
 
 Check your balance and setup a MPE channel to run your service.
 
@@ -320,78 +320,63 @@ snet account balance
 # deposit funds (10 COG) into MultiPartyEscrow (`MPE`) contract:
 snet account deposit 0.00000010
 
+# check your balance - 10 Cogs have been moved to MPE
+snet account balance
+
 # open a payment channel to your service:
 snet channel open-init $ORGANIZATION_ID $SERVICE_ID 0.0000001 +10days
-```
 
-```snet channel open-init``` prints the id of the created channel. Record it for use in the the following commands.
+# check your balance - 10 Cogs have been moved from MPE to the channel
+snet account balance
 
-With the above command we've opened and initialized a channel with 10 cogs for ORGANIZATION_ID/SERVICE_ID with expiration of 10 days (57600 blocks in the future with 15 sec/blocks):
-
-Check your channels:
-
-```
-# list of locally initialized channels
-snet channel print-initialized
-
-# list of all channels with the current identity as a sender
-snet channel print-all-filter-sender
-```
-
-You can inspect a channel state (you should use `CHANNEL_ID` which was returned by ```snet channel open-init```):
-
-```
-# !!! replace CHANNEL_ID with channel id
+# Look for the channel balance (CHANNEL_ID have been printed by 'snet channel open-init')
 snet client get-channel-state CHANNEL_ID $SERVICE_IP:$SERVICE_PORT
 ```
 
-Finally, you can call your service with:
+```snet channel open-init``` opened and initialized a channel with 10 cogs for ORGANIZATION_ID/SERVICE_ID with expiration of 10 days (57600 blocks in the future with 15 sec/blocks). It prints the id of the created channel. Record it for use in the the following commands.
+
+Call your service using:
 
 ```
-# snet client call $ORGANIZATION_ID $SERVICE_ID mul '{"a":12,"b":7}'
+snet client call $ORGANIZATION_ID $SERVICE_ID mul '{"a":12,"b":7}'
 ```
 
-At this point you've spent 1 Cog (as defined in step XXX 7) of your MPE channel calling the service.
-You can keep calling the service until your MPE channel run out of funds. Unused funds in the channel can be claimed back only after the channel expires.
+The MPE channel have changed. See its funds using
 
-## Step 11. Claiming funds from the MPE channel
+```
+# 1 Cog have been spent (signed) 
+snet client get-channel-state CHANNEL_ID $SERVICE_IP:$SERVICE_PORT
+```
 
-``` snet treasurer``` commands can be used to claim funds from a MPE channels. (see a complete list of 
+At this point you've spent 1 Cog (service cost is defined in step XXX 7) of your MPE channel calling the service. You can keep calling the service until your MPE channel run out of funds.
+
+As the service provider, you can claim spent Cogs at any time using
 
 ```
 snet treasurer claim-all --endpoint $SERVICE_IP:$SERVICE_PORT -y
-```
 
-Each payment channel has its expiration time (we've already encountered this parameter when we run ```snet channel open-init```). 
-After expiration time the sender can take back all unclaimed funds. 
-In service metadata we have the special parameter `payment-expiration-threshold` which by default is 40320 blocks, 
-or approximately one week with 15 sec/block (you can set this parameter in ```snet service metadata-init```). 
-Your service will automatically stop accepting payments in channels which will became expired in less then `payment-expiration-threshold blocks`. 
-
-We also have special command: ```snet treasurer claim-expired``` which will claim all channels which are close to expiration. 
-By default it will claim all channels which will be expired in 34560 blocks or 6 days with 15sec/block.
-
-It also should be noted that if your etcd storage is safe and channels have not expired then you are not required to claim your funds. 
-You can claim them when you want, for example once in several months. 
-
-Our recommendations are following
-- Your should run ```snet treasurer claim-expired``` each 1-3 days. We recommend automate it using `cron`.
-- You can run ```claim-all``` command when your want. For example once in several months.
-
-For more information about the `SNET MultiPartyEscrow` check this [link](https://dev.singularitynet.io/docs/all/mpe/mpe/). 
-
-## Step 12. (optional) Withdraw AGI tokens from MPE
-
-After the step 10, all the AGIs are in the MultiPartyEscrow (MPE).
-
-If you need to withdraw your tokens from MPE wallet, you should run the `SNET CLI` withdraw command.
-
-For example:
-
-```
-# !!! check current account and MPE balance
+# Claimed funds are know in MPE
 snet account balance
 
-# !!! withdraw tokens from MPE
+# Move funds from MPE to your account
 snet account withdraw AMOUNT_IN_AGI -y
+snet account balance
+```
+
+## Step 11. (optional) claiming unused funds from MPE channel
+
+As the service user, _you CAN'T claim unsused funds before the channel expires_. Once it did, you can claim the funds using ```snet treasurer claim-expired```
+
+```
+# Shows spent/unspent AGIs in the MPE channel
+snet client get-channel-state CHANNEL_ID $SERVICE_IP:$SERVICE_PORT
+snet account balance
+
+# Move funds from all expired channels to MPE
+snet treasurer claim-expired
+snet account balance
+
+# Move funds from MPE to user's account
+snet account withdraw AMOUNT_IN_AGI -y
+snet account balance
 ```
